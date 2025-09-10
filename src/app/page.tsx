@@ -5,15 +5,18 @@ import { ArrowRight, Key, Globe, BarChart3 } from 'lucide-react'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-secondary-50 to-secondary-100">
       {/* Navigation */}
       <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-blue-600">
-                Felora Portal
-              </Link>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+                  <span className="text-accent-500 font-bold text-lg">F</span>
+                </div>
+                <span className="text-2xl font-bold text-primary-500">Felora Portal</span>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" asChild>
@@ -32,7 +35,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Manage Your Global
-            <span className="block text-blue-600">Artifact Delivery</span>
+            <span className="block text-accent">Artifact Delivery</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
             Create and manage API keys, monitor usage, and control access to your 
@@ -64,8 +67,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card>
               <CardHeader>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <Key className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                  <Key className="h-6 w-6 text-accent" />
                 </div>
                 <CardTitle>API Key Management</CardTitle>
                 <CardDescription>
@@ -77,8 +80,8 @@ export default function Home() {
 
             <Card>
               <CardHeader>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <Globe className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                  <Globe className="h-6 w-6 text-accent" />
                 </div>
                 <CardTitle>Global Distribution</CardTitle>
                 <CardDescription>
@@ -90,8 +93,8 @@ export default function Home() {
 
             <Card>
               <CardHeader>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <BarChart3 className="h-6 w-6 text-blue-600" />
+                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                  <BarChart3 className="h-6 w-6 text-accent" />
                 </div>
                 <CardTitle>Usage Analytics</CardTitle>
                 <CardDescription>
@@ -105,12 +108,12 @@ export default function Home() {
       </section>
 
       {/* Quick Start */}
-      <section className="py-16 bg-blue-50">
+      <section className="py-16 bg-primary">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-primary-foreground mb-4">
             Ready to get started?
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-primary-foreground/80 mb-8">
             Create your first API key and start delivering artifacts globally in minutes.
           </p>
           <Button size="lg" asChild>
@@ -127,7 +130,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
-              <div className="text-2xl font-bold text-blue-600 mb-4">Felora Portal</div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-6 h-6 bg-gradient-to-br from-accent-500 to-accent-600 rounded-md flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">F</span>
+                </div>
+                <span className="text-2xl font-bold text-primary-500">Felora Portal</span>
+              </div>
               <p className="text-gray-600 max-w-md">
                 Manage your global artifact delivery network with powerful 
                 tools and real-time analytics.
