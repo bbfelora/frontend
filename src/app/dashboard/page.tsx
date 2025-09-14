@@ -1,10 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Plus, Key, Copy, Trash2, Calendar, Activity } from 'lucide-react'
 import { createApiKey, type CreateApiKeyRequest, type ApiKey } from '@/lib/api'
+import { useToast } from '@/components/ui/toast'
+import { LogoWithText } from '@/components/ui/logo'
 
 // Mock data for demonstration
 const mockApiKeys: ApiKey[] = [
@@ -30,6 +33,7 @@ export default function Dashboard() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>(mockApiKeys)
   const [isCreating, setIsCreating] = useState(false)
   const [newKeyName, setNewKeyName] = useState('')
+  const { addToast } = useToast()
 
   const handleCreateKey = async () => {
     if (!newKeyName.trim()) return
@@ -44,9 +48,13 @@ export default function Dashboard() {
       
       setApiKeys([newKey, ...apiKeys])
       setNewKeyName('')
-      alert(`API Key created!\n\nKey: ${newKey.key}\n\nPlease save this key - it won't be shown again.`)
+      addToast(`API Key "${newKeyName}" created successfully!`, 'success')
+      // Show the actual key in a separate toast
+      setTimeout(() => {
+        addToast(`Key: ${newKey.key} - Save this key, it won't be shown again!`, 'warning')
+      }, 500)
     } catch (error) {
-      alert('Failed to create API key. Make sure your Felora backend is running.')
+      addToast('Failed to create API key. Make sure your Felora backend is running.', 'error')
     } finally {
       setIsCreating(false)
     }
@@ -54,7 +62,7 @@ export default function Dashboard() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
-    alert('Copied to clipboard!')
+    addToast('Copied to clipboard!', 'success')
   }
 
   const formatDate = (dateString: string) => {
@@ -72,11 +80,13 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-blue-600">Felora Portal</h1>
+              <LogoWithText size="md" />
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-600">demo-org</span>
-              <Button variant="outline">Account</Button>
+              <Button variant="outline" asChild>
+                <Link href="/account">Account</Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -141,7 +151,7 @@ export default function Dashboard() {
                   placeholder="API Key name"
                   value={newKeyName}
                   onChange={(e) => setNewKeyName(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
                 />
                 <Button 
                   onClick={handleCreateKey}
@@ -193,7 +203,7 @@ export default function Dashboard() {
                             {apiKey.scopes.map((scope) => (
                               <span 
                                 key={scope}
-                                className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+                                className="bg-accent/10 text-accent text-xs px-2 py-1 rounded"
                               >
                                 {scope}
                               </span>

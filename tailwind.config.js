@@ -40,14 +40,14 @@ module.exports = {
           foreground: "hsl(var(--secondary-foreground))",
         },
         accent: {
-          DEFAULT: "#27ae60",
-          50: "#f0fdf4",
-          100: "#dcfce7",
-          500: "#27ae60",
-          600: "#22c55e",
-          700: "#16a34a",
-          foreground: "hsl(var(--accent-foreground))",
-        },
+  DEFAULT: "#10B981",   // jade green
+  50: "#ECFDF5",
+  100: "#D1FAE5",
+  500: "#10B981",
+  600: "#059669",
+  700: "#047857",
+  foreground: "hsl(var(--accent-foreground))",
+}, 
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
