@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
-import { Plus, Key, Copy, Trash2, Calendar, Activity } from 'lucide-react'
-import { createApiKey, type CreateApiKeyRequest, type ApiKey } from '@/lib/api'
+import { Plus, Key, Copy, Trash2, Calendar, Activity, AlertCircle } from 'lucide-react'
+import { createApiKey, type CreateApiKeyRequest, type ApiKey, getUsageMetrics, type UsageMetrics } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
 import { FeloraLogoWithText } from '@/components/ui/felora-logo'
 import { CreateApiKeyModal } from '@/components/create-api-key-modal'
@@ -32,7 +32,37 @@ const mockApiKeys: ApiKey[] = [
 
 export default function Dashboard() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>(mockApiKeys)
+  const [usageMetrics, setUsageMetrics] = useState<UsageMetrics | null>(null)
   const { addToast } = useToast()
+
+  const orgId = 'demo-org' // In real app, get from user context
+
+  useEffect(() => {
+    fetchUsageMetrics()
+  }, [])
+
+  const fetchUsageMetrics = async () => {
+    try {
+      const metrics = await getUsageMetrics(orgId)
+      setUsageMetrics(metrics)
+    } catch (error) {
+      // Mock data for demo
+      setUsageMetrics({
+        api_requests: {
+          current: 7234,
+          limit: 10000
+        },
+        storage_gb: {
+          current: 6.7,
+          limit: 10
+        },
+        bandwidth_gb: {
+          current: 78.3,
+          limit: 100
+        }
+      })
+    }
+  }
 
   const handleKeyCreated = (newKey: ApiKey) => {
     setApiKeys([newKey, ...apiKeys])
@@ -49,6 +79,31 @@ export default function Dashboard() {
       month: 'short', 
       day: 'numeric'
     })
+  }
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1)}M`
+    } else if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K`
+    }
+    return num.toString()
+  }
+
+  const getUsagePercentage = (current: number, limit: number) => {
+    return Math.round((current / limit) * 100)
+  }
+
+  const getUsageColor = (percentage: number) => {
+    if (percentage >= 90) return 'text-red-600'
+    if (percentage >= 75) return 'text-yellow-600'
+    return 'text-green-600'
+  }
+
+  const getProgressBarColor = (percentage: number) => {
+    if (percentage >= 90) return 'bg-red-500'
+    if (percentage >= 75) return 'bg-yellow-500'
+    return 'bg-accent'
   }
 
   return (
@@ -71,47 +126,153 @@ export default function Dashboard() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
+        {/* Usage Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active API Keys</CardTitle>
-              <Key className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{apiKeys.length}</div>
-              <p className="text-xs text-muted-foreground">
-                +1 from last month
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">1,234</div>
-              <p className="text-xs text-muted-foreground">
-                +12% from last month
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Cache Hit Rate</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">94%</div>
-              <p className="text-xs text-muted-foreground">
-                +2% from last month
-              </p>
-            </CardContent>
-          </Card>
+          {usageMetrics ? (
+            <>
+              {/* API Requests Usage */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">API Requests</CardTitle>
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold mb-2">
+                    {formatNumber(usageMetrics.api_requests.current)}
+                  </div>
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">
+                      of {formatNumber(usageMetrics.api_requests.limit)} limit
+                    </span>
+                    <span className={`font-medium ${getUsageColor(getUsagePercentage(usageMetrics.api_requests.current, usageMetrics.api_requests.limit))}`}>
+                      {getUsagePercentage(usageMetrics.api_requests.current, usageMetrics.api_requests.limit)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${getProgressBarColor(getUsagePercentage(usageMetrics.api_requests.current, usageMetrics.api_requests.limit))}`}
+                      style={{ width: `${Math.min(getUsagePercentage(usageMetrics.api_requests.current, usageMetrics.api_requests.limit), 100)}%` }}
+                    ></div>
+                  </div>
+                  {getUsagePercentage(usageMetrics.api_requests.current, usageMetrics.api_requests.limit) >= 90 && (
+                    <div className="flex items-center mt-2 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      Approaching limit
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Storage Usage */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Storage</CardTitle>
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold mb-2">
+                    {usageMetrics.storage_gb.current.toFixed(1)}GB
+                  </div>
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">
+                      of {usageMetrics.storage_gb.limit}GB limit
+                    </span>
+                    <span className={`font-medium ${getUsageColor(getUsagePercentage(usageMetrics.storage_gb.current, usageMetrics.storage_gb.limit))}`}>
+                      {getUsagePercentage(usageMetrics.storage_gb.current, usageMetrics.storage_gb.limit)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${getProgressBarColor(getUsagePercentage(usageMetrics.storage_gb.current, usageMetrics.storage_gb.limit))}`}
+                      style={{ width: `${Math.min(getUsagePercentage(usageMetrics.storage_gb.current, usageMetrics.storage_gb.limit), 100)}%` }}
+                    ></div>
+                  </div>
+                  {getUsagePercentage(usageMetrics.storage_gb.current, usageMetrics.storage_gb.limit) >= 90 && (
+                    <div className="flex items-center mt-2 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      Approaching limit
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Bandwidth Usage */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Bandwidth</CardTitle>
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold mb-2">
+                    {usageMetrics.bandwidth_gb.current.toFixed(1)}GB
+                  </div>
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">
+                      of {usageMetrics.bandwidth_gb.limit}GB limit
+                    </span>
+                    <span className={`font-medium ${getUsageColor(getUsagePercentage(usageMetrics.bandwidth_gb.current, usageMetrics.bandwidth_gb.limit))}`}>
+                      {getUsagePercentage(usageMetrics.bandwidth_gb.current, usageMetrics.bandwidth_gb.limit)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${getProgressBarColor(getUsagePercentage(usageMetrics.bandwidth_gb.current, usageMetrics.bandwidth_gb.limit))}`}
+                      style={{ width: `${Math.min(getUsagePercentage(usageMetrics.bandwidth_gb.current, usageMetrics.bandwidth_gb.limit), 100)}%` }}
+                    ></div>
+                  </div>
+                  {getUsagePercentage(usageMetrics.bandwidth_gb.current, usageMetrics.bandwidth_gb.limit) >= 90 && (
+                    <div className="flex items-center mt-2 text-xs text-red-600">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      Approaching limit
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          ) : (
+            // Loading state
+            <>
+              {[1, 2, 3].map(i => (
+                <Card key={i}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="w-4 h-4 bg-gray-200 rounded animate-pulse"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="w-16 h-8 bg-gray-200 rounded animate-pulse mb-2"></div>
+                    <div className="w-full h-2 bg-gray-200 rounded animate-pulse"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </>
+          )}
         </div>
+
+        {/* Usage Alert Card */}
+        {usageMetrics && (
+          usageMetrics.api_requests.current / usageMetrics.api_requests.limit >= 0.8 ||
+          usageMetrics.storage_gb.current / usageMetrics.storage_gb.limit >= 0.8 ||
+          usageMetrics.bandwidth_gb.current / usageMetrics.bandwidth_gb.limit >= 0.8
+        ) && (
+          <div className="mb-8">
+            <Card className="border-yellow-200 bg-yellow-50">
+              <CardContent className="p-4">
+                <div className="flex items-start space-x-3">
+                  <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-medium text-yellow-800">Usage Alert</h4>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      You're approaching your plan limits. Consider upgrading to avoid service interruption.
+                    </p>
+                    <Button variant="outline" size="sm" className="mt-3" asChild>
+                      <Link href="/account">View Plans</Link>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* API Keys Section */}
         <Card>
