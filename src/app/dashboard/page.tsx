@@ -7,7 +7,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Plus, Key, Copy, Trash2, Calendar, Activity } from 'lucide-react'
 import { createApiKey, type CreateApiKeyRequest, type ApiKey } from '@/lib/api'
 import { useToast } from '@/components/ui/toast'
-import { LogoWithText } from '@/components/ui/logo'
+import { FeloraLogoWithText } from '@/components/ui/felora-logo'
+import { CreateApiKeyModal } from '@/components/create-api-key-modal'
 
 // Mock data for demonstration
 const mockApiKeys: ApiKey[] = [
@@ -31,33 +32,10 @@ const mockApiKeys: ApiKey[] = [
 
 export default function Dashboard() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>(mockApiKeys)
-  const [isCreating, setIsCreating] = useState(false)
-  const [newKeyName, setNewKeyName] = useState('')
   const { addToast } = useToast()
 
-  const handleCreateKey = async () => {
-    if (!newKeyName.trim()) return
-    
-    setIsCreating(true)
-    try {
-      const newKey = await createApiKey({
-        name: newKeyName,
-        orgId: 'demo-org', // In real app, get from user context
-        scopes: ['artifacts:read']
-      })
-      
-      setApiKeys([newKey, ...apiKeys])
-      setNewKeyName('')
-      addToast(`API Key "${newKeyName}" created successfully!`, 'success')
-      // Show the actual key in a separate toast
-      setTimeout(() => {
-        addToast(`Key: ${newKey.key} - Save this key, it won't be shown again!`, 'warning')
-      }, 500)
-    } catch (error) {
-      addToast('Failed to create API key. Make sure your Felora backend is running.', 'error')
-    } finally {
-      setIsCreating(false)
-    }
+  const handleKeyCreated = (newKey: ApiKey) => {
+    setApiKeys([newKey, ...apiKeys])
   }
 
   const copyToClipboard = (text: string) => {
@@ -80,7 +58,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
-              <LogoWithText size="md" />
+              <FeloraLogoWithText size="md" />
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-600">demo-org</span>
@@ -145,22 +123,7 @@ export default function Dashboard() {
                   Manage your API keys for accessing the Felora delivery network
                 </CardDescription>
               </div>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  placeholder="API Key name"
-                  value={newKeyName}
-                  onChange={(e) => setNewKeyName(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
-                />
-                <Button 
-                  onClick={handleCreateKey}
-                  disabled={isCreating || !newKeyName.trim()}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {isCreating ? 'Creating...' : 'Create Key'}
-                </Button>
-              </div>
+              <CreateApiKeyModal onKeyCreated={handleKeyCreated} />
             </div>
           </CardHeader>
           <CardContent>

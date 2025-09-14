@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { ArrowLeft, LogOut, User, Settings } from 'lucide-react'
-import { LogoWithText } from '@/components/ui/logo'
+import { FeloraLogoWithText } from '@/components/ui/felora-logo'
 
 export default function Account() {
   const router = useRouter()
@@ -21,7 +21,7 @@ export default function Account() {
       <nav className="bg-white/90 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <LogoWithText size="md" />
+            <FeloraLogoWithText size="md" />
             <div className="flex items-center space-x-4">
               <Button variant="ghost" asChild>
                 <Link href="/dashboard" className="flex items-center">

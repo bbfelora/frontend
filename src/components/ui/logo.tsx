@@ -51,13 +51,45 @@ export function Logo({ size = 'md', variant = 'default', className = '' }: LogoP
         </div>
       </div>
       
-      {/* Custom F Logo SVG */}
+      {/* Custom Felora Logo SVG */}
       <svg 
-        viewBox="0 0 24 24" 
-        className={`relative z-10 ${config.text.includes('xs') ? 'w-3 h-3' : config.text.includes('sm') ? 'w-4 h-4' : config.text.includes('lg') ? 'w-6 h-6' : config.text.includes('xl') ? 'w-8 h-8' : 'w-5 h-5'} ${styles.icon}`}
-        fill="currentColor"
+        viewBox="0 0 32 32" 
+        className={`relative z-10 ${config.text.includes('xs') ? 'w-4 h-4' : config.text.includes('sm') ? 'w-5 h-5' : config.text.includes('lg') ? 'w-7 h-7' : config.text.includes('xl') ? 'w-10 h-10' : 'w-6 h-6'}`}
+        fill="none"
       >
-        <path d="M6 2h12c.6 0 1 .4 1 1s-.4 1-1 1H8v7h8c.6 0 1 .4 1 1s-.4 1-1 1H8v7c0 .6-.4 1-1 1s-1-.4-1-1V3c0-.6.4-1 1-1z"/>
+        {/* Main geometric F shape */}
+        <path 
+          d="M8 6h16v4H12v4h12v4H12v8H8V6z" 
+          fill="currentColor"
+          className={styles.icon}
+        />
+        
+        {/* Decorative geometric elements */}
+        <circle 
+          cx="24" 
+          cy="8" 
+          r="2" 
+          fill="currentColor"
+          className={`${styles.icon} opacity-70`}
+        />
+        
+        <rect 
+          x="26" 
+          y="12" 
+          width="3" 
+          height="3" 
+          fill="currentColor"
+          className={`${styles.icon} opacity-50`}
+        />
+        
+        {/* Connection lines */}
+        <path 
+          d="M24 10v2M26 15h2" 
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          className={`${styles.icon} opacity-60`}
+        />
       </svg>
       
       {/* Subtle highlight */}

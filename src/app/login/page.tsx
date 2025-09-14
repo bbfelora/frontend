@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/toast'
-import { Logo } from '@/components/ui/logo'
+import { FeloraLogo } from '@/components/ui/felora-logo'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -41,7 +41,7 @@ export default function Login() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <Logo size="xl" />
+            <FeloraLogo size="xl" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
           <p className="text-muted-foreground text-sm mt-1">Sign in to your Felora account</p>
